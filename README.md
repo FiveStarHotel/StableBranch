@@ -16,7 +16,7 @@ uv sync
 ### Запуск сервера
 Ниже описана последовательность действий для запуска сервера:
 ```
-uv run uvicorn main:app --reload
+uv run uvicorn backend.main:app --reload
 ```
 
 ## Программный стек
