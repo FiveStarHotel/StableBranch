@@ -2,7 +2,7 @@ import unicodedata
 from pydantic import BaseModel, EmailStr, Field, field_validator, SecretStr
 
 class UserBase(BaseModel):
-    username: str = Field(min_length=1, max_length=256)
+    username: str = Field(min_length=4, max_length=256)
     email: EmailStr
 
     model_config = {
@@ -32,7 +32,7 @@ class UserRead(UserBase):
     }
 
 class UserProfileUpdate(BaseModel):
-    username: str | None = Field(default=None, min_length=1, max_length=256)
+    username: str | None = Field(default=None, min_length=4, max_length=256)
     email: EmailStr | None = None
 
     model_config = {"str_strip_whitespace": True, "extra": "forbid"}
