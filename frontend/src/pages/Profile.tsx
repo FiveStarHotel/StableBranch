@@ -4,6 +4,7 @@ import {
   Container,
   Group,
   Image,
+  Modal,
   Paper,
   PasswordInput,
   PinInput,
@@ -14,13 +15,14 @@ import {
   Title,
 } from '@mantine/core'
 import { isEmail, matchesField, useForm } from '@mantine/form'
-import { ArrowLeft, SignOut } from '@phosphor-icons/react'
+import { ArrowLeft, SignOut, Trash } from '@phosphor-icons/react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 
-import { changePassword, confirmEmailChange, logout, requestEmailChange, useMe } from '../api/auth'
+import { changePassword, confirmEmailChange, deleteAccount, logout, requestEmailChange, updateUsername, useMe } from '../api/auth'
 import { ApiError, commonErrorMessage } from '../api/client'
+import { clearTokens } from '../auth/tokens'
 import { FormAlert } from '../components/FormAlert'
 import logo from '../assets/logo.svg'
 
@@ -37,11 +39,23 @@ export function ProfilePage() {
   const [emailCodeStep, setEmailCodeStep] = useState(false)
   const [emailSuccess, setEmailSuccess] = useState(false)
   const [passwordSuccess, setPasswordSuccess] = useState(false)
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const emailForm = useForm({
     initialValues: { newEmail: '', code: '' },
     validate: { newEmail: isEmail('Неверный формат почты') },
+  })
+  const usernameForm = useForm({
+    initialValues: { username: '' },
+    validate: {
+      username: (value) => {
+        const username = value.trim().normalize('NFC')
+        if (username.length < 4 || username.length > 256) return 'От 4 до 256 символов'
+        if (!/^[\p{L}\p{N}_]+$/u.test(username)) return 'Только буквы, цифры и _'
+        return null
+      },
+    },
   })
   const passwordForm = useForm({
     initialValues: { oldPassword: '', newPassword: '', confirmPassword: '' },
@@ -49,6 +63,18 @@ export function ProfilePage() {
       oldPassword: (value) => (value ? null : 'Введите текущий пароль'),
       newPassword: (value) => (value.length < 8 || value.length > 128 ? 'От 8 до 128 символов' : null),
       confirmPassword: matchesField('newPassword', 'Пароли не совпадают'),
+    },
+  })
+
+  useEffect(() => {
+    if (user) usernameForm.setValues({ username: user.username })
+  }, [user?.username])
+
+  const usernameMutation = useMutation({
+    mutationFn: (username: string) => updateUsername(username),
+    onSuccess: (updatedUser) => {
+      queryClient.setQueryData(['users', 'me'], updatedUser)
+      usernameForm.setValues({ username: updatedUser.username })
     },
   })
 
@@ -79,6 +105,14 @@ export function ProfilePage() {
   const logoutMutation = useMutation({
     mutationFn: logout,
     onSettled: () => {
+      queryClient.clear()
+      navigate('/login', { replace: true })
+    },
+  })
+  const deleteAccountMutation = useMutation({
+    mutationFn: deleteAccount,
+    onSuccess: () => {
+      clearTokens()
       queryClient.clear()
       navigate('/login', { replace: true })
     },
@@ -115,6 +149,44 @@ export function ProfilePage() {
             <Title order={1}>Профиль</Title>
             <Text size="sm" c="dimmed">{user?.username} · {user?.email}</Text>
           </Stack>
+
+          <Paper withBorder p="lg" radius="md">
+            <form
+              noValidate
+              onSubmit={usernameForm.onSubmit((values) => {
+                usernameMutation.reset()
+                usernameMutation.mutate(values.username.trim().normalize('NFC'))
+              })}
+            >
+              <Stack gap="md">
+                <Stack gap={4}>
+                  <Title order={3}>Имя пользователя</Title>
+                  <Text size="sm" c="dimmed">Это имя отображается в профиле</Text>
+                </Stack>
+                {usernameMutation.isError && (
+                  <FormAlert>
+                    {usernameMutation.error instanceof ApiError && usernameMutation.error.status === 409
+                      ? 'Это имя уже используется другим аккаунтом'
+                      : commonErrorMessage(usernameMutation.error)}
+                  </FormAlert>
+                )}
+                {usernameMutation.isSuccess && <Text size="sm" c="accent">Имя обновлено</Text>}
+                <TextInput
+                  label="Новое имя"
+                  autoComplete="username"
+                  {...usernameForm.getInputProps('username')}
+                />
+                <Button
+                  type="submit"
+                  w="fit-content"
+                  loading={usernameMutation.isPending}
+                  disabled={usernameForm.values.username.trim().normalize('NFC') === user?.username}
+                >
+                  Сохранить имя
+                </Button>
+              </Stack>
+            </form>
+          </Paper>
 
           <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg" verticalSpacing="lg">
         <Paper withBorder p="lg" radius="md">
@@ -243,8 +315,61 @@ export function ProfilePage() {
               Выйти на всех устройствах
             </Button>
           </Group>
+
+          <Paper withBorder p="lg" radius="md">
+            <Group justify="space-between" align="center" wrap="wrap" gap="md">
+              <Stack gap={4}>
+                <Title order={3} c="red">Удаление аккаунта</Title>
+                <Text size="sm" c="dimmed">Аккаунт и связанные сессии будут удалены без возможности восстановления</Text>
+                {deleteAccountMutation.isError && (
+                  <FormAlert>{commonErrorMessage(deleteAccountMutation.error)}</FormAlert>
+                )}
+              </Stack>
+              <Button
+                color="red"
+                variant="light"
+                leftSection={<Trash size={18} />}
+                onClick={() => setDeleteConfirmOpen(true)}
+              >
+                Удалить аккаунт
+              </Button>
+            </Group>
+          </Paper>
         </Stack>
       </Container>
+      <Modal
+        opened={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+        title="Удалить аккаунт"
+        centered
+        closeOnClickOutside={!deleteAccountMutation.isPending}
+        closeOnEscape={!deleteAccountMutation.isPending}
+      >
+        <Stack gap="lg">
+          <Text size="sm">
+            Аккаунт {user?.username} и связанные сессии будут удалены без возможности восстановления.
+          </Text>
+          {deleteAccountMutation.isError && (
+            <FormAlert>{commonErrorMessage(deleteAccountMutation.error)}</FormAlert>
+          )}
+          <Group justify="flex-end">
+            <Button
+              variant="default"
+              disabled={deleteAccountMutation.isPending}
+              onClick={() => setDeleteConfirmOpen(false)}
+            >
+              Отмена
+            </Button>
+            <Button
+              color="red"
+              loading={deleteAccountMutation.isPending}
+              onClick={() => deleteAccountMutation.mutate()}
+            >
+              Удалить аккаунт
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </Stack>
   )
 }
