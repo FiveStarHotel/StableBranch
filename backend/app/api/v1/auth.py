@@ -22,3 +22,7 @@ async def confirm_registration(payload: RegisterConfirm, session: SessionDep):
 @router.post("/login", response_model=Token)
 async def login(form: Annotated[OAuth2PasswordRequestForm, Depends()], session: SessionDep):
     return await service_auth.login(form.username, form.password, session)
+
+@router.post("/refresh", response_model=Token)
+async def refresh_access_token(refresh_token: str, session: SessionDep):
+    return await service_auth.refresh_access_token(refresh_token, session)

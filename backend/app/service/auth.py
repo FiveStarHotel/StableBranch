@@ -6,6 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.app.core.config import settings
 from backend.app.core.exceptions import (
     CredentialsError,
+    InactiveUserError,
+    InvalidRefreshTokenError,
     InvalidVerificationCodeError,
     TooManyVerificationAttemptsError,
     UsernameOrEmailOccupiedError,
@@ -131,3 +133,31 @@ async def login(username: str, password: str, session: AsyncSession) -> Token:
 
     return await _issue_token(user.id, session)
 
+
+async def refresh_access_token(refresh_token: str, session: AsyncSession) -> Token:
+    stored_refresh_token = await repository_refresh_token.get_refresh_token_by_hash(
+        session,
+        hash_refresh_token(refresh_token)
+    )
+
+    if stored_refresh_token is None:
+        raise InvalidRefreshTokenError()
+
+    user = await repository_users.get_user_by_id(session, stored_refresh_token.user_id)
+
+    if user is None:
+        raise InvalidRefreshTokenError()
+
+    if stored_refresh_token.expires_at <= datetime.now(UTC):
+        raise InvalidRefreshTokenError()
+    
+    if stored_refresh_token.revoked_at is not None:
+        raise InvalidRefreshTokenError() # TODO: Заменить выходом со всех устройств (в реальном мире еще и ором на электронную почту)
+
+    if not user.is_active:
+        raise InactiveUserError()
+
+    await repository_refresh_token.revoke_refresh_token(session, stored_refresh_token)
+    await session.commit()
+
+    return await _issue_token(user.id, session)

@@ -28,3 +28,13 @@ class TooManyVerificationAttemptsError(AppError):
 class CredentialsError(AppError):
     status_code = status.HTTP_404_NOT_FOUND
     detail = "Invalid username, email or password!"
+
+
+class InvalidRefreshTokenError(AppError):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = "Invalid refresh token!"
+
+
+class InactiveUserError(AppError):
+    status_code = status.HTTP_403_FORBIDDEN
+    detail = "User is inactive!"

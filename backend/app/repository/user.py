@@ -40,6 +40,10 @@ async def get_user_by_username_or_email(session: AsyncSession, username: str, em
     return user
 
 
+async def get_user_by_id(session: AsyncSession, user_id: int) -> User | None:
+    return await session.get(User, user_id)
+
+
 async def create_user(
     session: AsyncSession,
     username: str,
