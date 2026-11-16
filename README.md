@@ -29,6 +29,18 @@ uv run uvicorn backend.main:app --reload
 docker compose -f Compose.yaml up
 ```
 
+### Запуск фронтенда
+Необходим установленный `Node.js` (проверено на версии 26) вместе с `npm`.
+
+Ниже описана последовательность действий для запуска фронтенда:
+```
+cd frontend
+npm install
+npm run dev
+```
+
+Фронтенд будет доступен по адресу `http://localhost:5173`. Запросы на `/api` Vite перенаправляет на сервер `http://localhost:8000`, поэтому сервер и база данных должны быть запущены.
+
 ## Описание .env файла
 ### Настройки SQLAlchemy / Alembic
 - `DATABASE_URL`: URL базы данных для SQLAlchemy и Alembic.
