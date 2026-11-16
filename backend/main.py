@@ -1,8 +1,7 @@
-from fastapi import FastAPI, status
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI
+
+from backend.app.api.v1.health import router as router_health
 
 app = FastAPI()
 
-@app.get("/health")
-def check_health():
-    return HTMLResponse("I'm alive!", status_code=status.HTTP_200_OK)
+app.include_router(router_health)
