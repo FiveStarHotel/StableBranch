@@ -25,6 +25,11 @@ class TooManyVerificationAttemptsError(AppError):
     detail = "Too many attempts, registration failed. Register again."
 
 
+class TooManyAccountVerificationAttemptsError(AppError):
+    status_code = status.HTTP_429_TOO_MANY_REQUESTS
+    detail = "Too many verification attempts."
+
+
 class CredentialsError(AppError):
     status_code = status.HTTP_401_UNAUTHORIZED
     detail = "Invalid username, email or password!"

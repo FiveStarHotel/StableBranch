@@ -35,7 +35,6 @@ class UserRead(UserBase):
 
 class UserProfileUpdate(BaseModel):
     username: str | None = Field(default=None, min_length=4, max_length=256)
-    email: EmailStr | None = None
 
     model_config = {"str_strip_whitespace": True, "extra": "forbid"}
 
@@ -53,6 +52,25 @@ class PasswordChange(BaseModel):
     old_password: SecretStr = Field(min_length=8, max_length=128)
     new_password: SecretStr = Field(min_length=8, max_length=128)
 
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
+class PasswordResetVerifyCode(BaseModel):
+    email: EmailStr
+    code: str = Field(pattern=r"^\d{6}$")
+
+class PasswordResetComplete(BaseModel):
+    reset_token: str
+    new_password: SecretStr = Field(min_length=8, max_length=128)
+
 class RegisterConfirm(BaseModel):
+    email: EmailStr
+    code: str = Field(pattern=r"^\d{6}$")
+
+class EmailChange(BaseModel):
+    old_email: EmailStr
+    new_email: EmailStr
+
+class EmailChangeConfirm(BaseModel):
     email: EmailStr
     code: str = Field(pattern=r"^\d{6}$")

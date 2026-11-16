@@ -56,6 +56,7 @@ export function LoginPage() {
           </Button>
         </Stack>
       </form>
+      <AuthSwitch question="Забыли пароль?" link="Восстановить пароль" to="/reset-password" />
       <AuthSwitch question="Нет аккаунта?" link="Зарегистрироваться" to="/register" />
     </AuthLayout>
   )

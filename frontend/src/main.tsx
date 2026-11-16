@@ -10,8 +10,10 @@ import { RouterProvider } from 'react-router/dom'
 
 import { GuestOnly, RequireAuth } from './auth/guards'
 import { LoginPage } from './pages/Login'
+import { ProfilePage } from './pages/Profile'
 import { ProjectsPage } from './pages/Projects'
 import { RegisterPage } from './pages/Register'
+import { ResetPasswordPage } from './pages/ResetPassword'
 import { cssVariablesResolver, theme } from './theme'
 
 const queryClient = new QueryClient({
@@ -24,11 +26,15 @@ const router = createBrowserRouter([
     children: [
       { path: '/login', Component: LoginPage },
       { path: '/register', Component: RegisterPage },
+      { path: '/reset-password', Component: ResetPasswordPage },
     ],
   },
   {
     Component: RequireAuth,
-    children: [{ path: '/projects', Component: ProjectsPage }],
+    children: [
+      { path: '/projects', Component: ProjectsPage },
+      { path: '/profile', Component: ProfilePage },
+    ],
   },
   // shortcut: лендинга пока нет, всё остальное ведёт в приложение (или на вход)
   { path: '*', element: <Navigate to="/projects" replace /> },
