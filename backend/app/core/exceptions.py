@@ -14,3 +14,12 @@ class AppError(Exception):
 class UsernameOrEmailOccupiedError(AppError):
     status_code = status.HTTP_409_CONFLICT
     detail = "Username or email is occupied!"
+
+
+class InvalidVerificationCodeError(AppError):
+    detail = "Invalid or expired code!"
+
+
+class TooManyVerificationAttemptsError(AppError):
+    status_code = status.HTTP_429_TOO_MANY_REQUESTS
+    detail = "Too many attempts, registration failed. Register again."

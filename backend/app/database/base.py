@@ -9,7 +9,7 @@ from backend.app.core.config import settings
 
 engine = create_async_engine(
     url=settings.database_url,
-    echo=True
+    echo=settings.sqlalchemy_echo
 )
 
 SessionLocal = async_sessionmaker(

@@ -13,7 +13,10 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(256), unique=True, index=True, nullable=False)
     email: Mapped[str] = mapped_column(String(320), unique=True, index=True, nullable=False)
     hash_password: Mapped[str] = mapped_column(String(255), nullable=False)
-    is_active: Mapped[bool] = mapped_column(default=True)
+    is_active: Mapped[bool] = mapped_column(default=False)
+    verification_code_hash: Mapped[str | None] = mapped_column(String(64), default=None)
+    verification_code_expires_at: Mapped[datetime | None] = mapped_column(default=None)
+    verification_attempts: Mapped[int] = mapped_column(default=0)
 
 
 class RefreshToken(Base):

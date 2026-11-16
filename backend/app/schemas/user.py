@@ -50,3 +50,7 @@ class UserProfileUpdate(BaseModel):
 class PasswordChange(BaseModel):
     old_password: SecretStr = Field(min_length=8, max_length=128)
     new_password: SecretStr = Field(min_length=8, max_length=128)
+
+class RegisterConfirm(BaseModel):
+    email: EmailStr
+    code: str = Field(pattern=r"^\d{6}$")

@@ -7,9 +7,12 @@ class Settings(BaseSettings):
     )
 
     database_url: str
+    sqlalchemy_echo: bool
     secret_token: str
     jwt_algorithm: str
     access_token_ttl: int
     refresh_token_ttl: int
+    max_verification_code_attempts: int
+    verification_code_ttl: int
 
 settings = Settings()   # pyright: ignore[reportCallIssue]
