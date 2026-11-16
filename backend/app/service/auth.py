@@ -5,11 +5,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.core.config import settings
 from backend.app.core.exceptions import (
+    CredentialsError,
     InvalidVerificationCodeError,
     TooManyVerificationAttemptsError,
     UsernameOrEmailOccupiedError,
 )
 from backend.app.core.security import (
+    DUMMY_HASH,
     generate_access_token,
     generate_refresh_token,
     generate_verification_code,
@@ -18,6 +20,7 @@ from backend.app.core.security import (
     hash_verification_code,
     send_verification_code,
     validate_verification_code,
+    verify_password,
 )
 from backend.app.database.models import User
 from backend.app.repository import refresh_token as repository_refresh_token
@@ -84,6 +87,7 @@ async def register(user: UserCreate, session: AsyncSession):
     
     send_verification_code(new_user.email, code)
     
+
 # 5 попыток на ввод верификации. Неудача - регистрация заново
 async def confirm_registration(data: RegisterConfirm, session: AsyncSession) -> Token:
     user = await repository_users.get_user_by_email(session, data.email)
@@ -109,3 +113,21 @@ async def confirm_registration(data: RegisterConfirm, session: AsyncSession) -> 
     user.verification_code_expires_at = None
     
     return await _issue_token(user.id, session)
+
+
+async def login(username: str, password: str, session: AsyncSession) -> Token:
+    user = await repository_users.get_user_by_username_or_email(
+        session,
+        username=username,
+        email=username
+    )
+
+    if user is None:
+        await verify_password(password, DUMMY_HASH)
+        raise CredentialsError()
+    
+    if not await verify_password(password, user.hash_password):
+        raise CredentialsError()
+
+    return await _issue_token(user.id, session)
+

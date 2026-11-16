@@ -10,6 +10,7 @@ from pwdlib import PasswordHash
 from backend.app.core.config import settings
 
 password_hash = PasswordHash.recommended()
+DUMMY_HASH = password_hash.hash("stupiddummypassword")
 
 async def hash_password(password: str) -> str:
     return await asyncio.to_thread(password_hash.hash, password)

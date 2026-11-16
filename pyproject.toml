@@ -13,4 +13,5 @@ dependencies = [
     "pyjwt>=2.15.1",
     "sqlalchemy[asyncio]>=2.1.8",
     "uvicorn>=0.54.0",
+    "python-multipart>=0.0.34",
 ]
