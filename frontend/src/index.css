@@ -1,0 +1,11 @@
+/* Полотно с сеткой точек, как в макетах экранов входа */
+.dotted-canvas {
+  background-color: var(--sb-bg-canvas);
+  background-image: radial-gradient(var(--sb-canvas-dot) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* В макетах у поля с ошибкой красная только рамка, текст обычный */
+.mantine-Input-input[data-error] {
+  color: var(--mantine-color-text);
+}

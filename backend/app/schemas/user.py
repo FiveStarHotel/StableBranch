@@ -1,5 +1,7 @@
 import unicodedata
-from pydantic import BaseModel, EmailStr, Field, field_validator, SecretStr
+
+from pydantic import BaseModel, EmailStr, Field, SecretStr, field_validator
+
 
 class UserBase(BaseModel):
     username: str = Field(min_length=4, max_length=256)
@@ -50,3 +52,7 @@ class UserProfileUpdate(BaseModel):
 class PasswordChange(BaseModel):
     old_password: SecretStr = Field(min_length=8, max_length=128)
     new_password: SecretStr = Field(min_length=8, max_length=128)
+
+class RegisterConfirm(BaseModel):
+    email: EmailStr
+    code: str = Field(pattern=r"^\d{6}$")
