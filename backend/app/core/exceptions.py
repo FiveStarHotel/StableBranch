@@ -38,3 +38,8 @@ class InvalidRefreshTokenError(AppError):
 class InactiveUserError(AppError):
     status_code = status.HTTP_403_FORBIDDEN
     detail = "User is inactive!"
+
+
+class InvalidAccessToken(AppError):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = "Invalid access token!"
