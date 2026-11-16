@@ -32,5 +32,5 @@ async def logout(payload: RefreshRequest, session: SessionDep):
     await service_auth.logout(payload, session)
 
 @router.post("/logout-all", status_code=status.HTTP_204_NO_CONTENT)
-async def logot_all_devices(payload: RefreshRequest, session: SessionDep):
+async def logout_all_devices(payload: RefreshRequest, session: SessionDep):
     await service_auth.logout_all_devices(payload, session)
