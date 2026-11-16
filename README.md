@@ -13,11 +13,36 @@ cd StableBranch
 uv sync
 ```
 
+Далее необходимо настроить `.env` файл. Пример конфигурации представлен в файле `.env.example`. ОБЯЗАТЕЛЬНО ПОМЕНЯТЬ ВСЕ ПОЛЯ С `!Change_Me`.
+
+Приведено в следующем блоке.
+
 ### Запуск сервера
 Ниже описана последовательность действий для запуска сервера:
 ```
 uv run uvicorn backend.main:app --reload
 ```
+
+### Запуск базы данных
+Необходим установленный `Docker`.
+```
+docker compose -f Compose.yaml up
+```
+
+## Описание .env файла
+### Настройки SQLAlchemy / Alembic
+- `DATABASE_URL`: URL базы данных для SQLAlchemy и Alembic.
+- `SQLALCHEMY_ECHO`: Булевое значения для echo движка SQLAlchemy.
+### Настройки токенов
+- `SECRET_TOKEN`: Секретный токен, на основе которого выполняется хэширование JWT токенов и Email токенов верификации.
+#### JWT
+- `JWT_ALGORITHM`: Алгоритм для хэширования JWT токена.
+- `ACCESS_TOKEN_TTL`: Время жизни JWT токена в секундах.
+#### Refresh токен
+- `REFRESH_TOKEN_TTL`: Время жизни Refresh токена в секундах.
+#### Код Email верификации
+- `MAX_VERIFICATION_CODE_ATTEMTPS`: Количество попыток ввода кода до сброса регистрации.
+- `VERIFICATION_CODE_TTL`: Время жизни кода Email верификации в секундах.
 
 ## Программный стек
 - Backend: `FastAPI`
