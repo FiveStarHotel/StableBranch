@@ -131,6 +131,9 @@ async def login(username: str, password: str, session: AsyncSession) -> Token:
     if not await verify_password(password, user.hash_password):
         raise CredentialsError()
 
+    if not user.is_active:
+        raise InactiveUserError()
+
     return await _issue_token(user.id, session)
 
 

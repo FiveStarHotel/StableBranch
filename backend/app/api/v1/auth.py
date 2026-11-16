@@ -8,7 +8,7 @@ from backend.app.schemas.token import Token
 from backend.app.schemas.user import RegisterConfirm, UserCreate
 from backend.app.service import auth as service_auth
 
-router = APIRouter()
+router = APIRouter(prefix="/auth")
 
 @router.post("/register", status_code=status.HTTP_202_ACCEPTED)
 async def register_user(payload: UserCreate, session: SessionDep):

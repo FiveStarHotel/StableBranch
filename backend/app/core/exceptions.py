@@ -26,7 +26,7 @@ class TooManyVerificationAttemptsError(AppError):
 
 
 class CredentialsError(AppError):
-    status_code = status.HTTP_404_NOT_FOUND
+    status_code = status.HTTP_401_UNAUTHORIZED
     detail = "Invalid username, email or password!"
 
 

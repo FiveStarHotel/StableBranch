@@ -5,7 +5,7 @@ from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.core.exceptions import InvalidAccessToken
+from backend.app.core.exceptions import InactiveUserError, InvalidAccessToken
 from backend.app.core.security import validate_access_token
 from backend.app.database.base import SessionLocal
 from backend.app.database.models import User
@@ -31,6 +31,9 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], sessio
 
     if user is None:
         raise InvalidAccessToken()
+
+    if not user.is_active:
+        raise InactiveUserError()
 
     return user
 
