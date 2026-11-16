@@ -9,3 +9,8 @@ class AppError(Exception):
         if detail is not None:
             self.detail = detail
         super().__init__(self.detail)
+
+
+class UsernameOrEmailOccupiedError(AppError):
+    status_code = status.HTTP_409_CONFLICT
+    detail = "Username or email is occupied!"

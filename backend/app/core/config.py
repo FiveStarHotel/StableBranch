@@ -7,5 +7,9 @@ class Settings(BaseSettings):
     )
 
     database_url: str
+    secret_token: str
+    jwt_algorithm: str
+    access_token_ttl: int
+    refresh_token_ttl: int
 
 settings = Settings()   # pyright: ignore[reportCallIssue]
