@@ -52,9 +52,16 @@ class PasswordChange(BaseModel):
     old_password: SecretStr = Field(min_length=8, max_length=128)
     new_password: SecretStr = Field(min_length=8, max_length=128)
 
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
 class PasswordResetVerifyCode(BaseModel):
     email: EmailStr
-    code: str
+    code: str = Field(pattern=r"^\d{6}$")
+
+class PasswordResetComplete(BaseModel):
+    reset_token: str
+    new_password: SecretStr = Field(min_length=8, max_length=128)
 
 class RegisterConfirm(BaseModel):
     email: EmailStr
@@ -63,3 +70,7 @@ class RegisterConfirm(BaseModel):
 class EmailChange(BaseModel):
     old_email: EmailStr
     new_email: EmailStr
+
+class EmailChangeConfirm(BaseModel):
+    email: EmailStr
+    code: str = Field(pattern=r"^\d{6}$")

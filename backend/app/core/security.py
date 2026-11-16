@@ -43,6 +43,33 @@ def validate_access_token(token: str) -> int:
     return int(payload["sub"])
 
 
+def generate_password_reset_token(user_id: int) -> str:
+    now = datetime.now(UTC)
+    payload = {
+        "sub": str(user_id),
+        "purpose": "password_reset",
+        "jti": secrets.token_urlsafe(16),
+        "iat": now,
+        "exp": now + timedelta(seconds=settings.verification_code_ttl),
+    }
+    return jwt.encode(payload, settings.secret_token, settings.jwt_algorithm)
+
+
+def validate_password_reset_token(token: str) -> int | None:
+    try:
+        payload = jwt.decode(
+            token,
+            settings.secret_token,
+            [settings.jwt_algorithm],
+            options={"require": ["sub", "purpose", "jti", "exp", "iat"]},
+        )
+        if payload["purpose"] != "password_reset":
+            return None
+        return int(payload["sub"])
+    except (jwt.InvalidTokenError, TypeError, ValueError):
+        return None
+
+
 def generate_refresh_token() -> str:
     return secrets.token_hex(64)
 
