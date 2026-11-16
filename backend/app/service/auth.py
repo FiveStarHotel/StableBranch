@@ -3,6 +3,7 @@ from datetime import UTC, datetime, timedelta
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from backend.app.api.v1.auth import RefreshRequest
 from backend.app.core.config import settings
 from backend.app.core.exceptions import (
     CredentialsError,
@@ -137,10 +138,10 @@ async def login(username: str, password: str, session: AsyncSession) -> Token:
     return await _issue_token(user.id, session)
 
 
-async def refresh_access_token(refresh_token: str, session: AsyncSession) -> Token:
+async def refresh_access_token(refresh_payload: RefreshRequest, session: AsyncSession) -> Token:
     stored_refresh_token = await repository_refresh_token.get_refresh_token_by_hash(
         session,
-        hash_refresh_token(refresh_token)
+        hash_refresh_token(refresh_payload.refresh_token)
     )
 
     if stored_refresh_token is None:

@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 
 from backend.app.core.dependency import SessionDep
-from backend.app.schemas.token import Token
+from backend.app.schemas.token import RefreshRequest, Token
 from backend.app.schemas.user import RegisterConfirm, UserCreate
 from backend.app.service import auth as service_auth
 
@@ -24,5 +24,5 @@ async def login(form: Annotated[OAuth2PasswordRequestForm, Depends()], session: 
     return await service_auth.login(form.username, form.password, session)
 
 @router.post("/refresh", response_model=Token)
-async def refresh_access_token(refresh_token: str, session: SessionDep):
-    return await service_auth.refresh_access_token(refresh_token, session)
+async def refresh_access_token(payload: RefreshRequest, session: SessionDep):
+    return await service_auth.refresh_access_token(payload, session)

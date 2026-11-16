@@ -1,5 +1,7 @@
 import unicodedata
-from pydantic import BaseModel, EmailStr, Field, field_validator, SecretStr
+
+from pydantic import BaseModel, EmailStr, Field, SecretStr, field_validator
+
 
 class UserBase(BaseModel):
     username: str = Field(min_length=4, max_length=256)
