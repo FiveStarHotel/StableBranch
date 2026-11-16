@@ -165,3 +165,39 @@ async def refresh_access_token(refresh_payload: RefreshRequest, session: AsyncSe
     await session.commit()
 
     return await _issue_token(user.id, session)
+
+
+async def logout(refresh_payload: RefreshRequest, session: AsyncSession) -> None:
+    stored_refresh_token = await repository_refresh_token.get_refresh_token_by_hash(
+        session,
+        hash_refresh_token(refresh_payload.refresh_token)
+    )
+
+    if stored_refresh_token is None or stored_refresh_token.revoked_at is not None:
+        return
+    
+    await repository_refresh_token.revoke_refresh_token(
+        session,
+        stored_refresh_token
+    )
+
+    await session.commit()
+
+
+async def logout_all_devices(refresh_payload: RefreshRequest, session: AsyncSession) -> None:
+    stored_refresh_token = await repository_refresh_token.get_refresh_token_by_hash(
+        session,
+        hash_refresh_token(refresh_payload.refresh_token)
+    )
+
+    if stored_refresh_token is None:
+        raise InvalidRefreshTokenError()
+
+    if stored_refresh_token.expires_at <= datetime.now(UTC):
+        raise InvalidRefreshTokenError()
+
+    if stored_refresh_token.revoked_at is not None:
+        raise InvalidRefreshTokenError()
+
+    await repository_refresh_token.revoke_all_user_refresh_tokens(session, stored_refresh_token.user_id)
+    await session.commit()

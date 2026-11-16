@@ -26,3 +26,11 @@ async def login(form: Annotated[OAuth2PasswordRequestForm, Depends()], session: 
 @router.post("/refresh", response_model=Token)
 async def refresh_access_token(payload: RefreshRequest, session: SessionDep):
     return await service_auth.refresh_access_token(payload, session)
+
+@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+async def logout(payload: RefreshRequest, session: SessionDep):
+    await service_auth.logout(payload, session)
+
+@router.post("/logout-all", status_code=status.HTTP_204_NO_CONTENT)
+async def logot_all_devices(payload: RefreshRequest, session: SessionDep):
+    await service_auth.logout_all_devices(payload, session)
