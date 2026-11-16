@@ -3,8 +3,11 @@ name = "stablebranch"
 version = "0.1.0"
 requires-python = ">=3.14"
 dependencies = [
+    "aiomysql>=0.3.2",
+    "alembic>=1.20.1",
     "fastapi>=0.162.2",
     "pydantic>=2.14.3",
+    "pydantic-settings>=2.16.3",
     "sqlalchemy[asyncio]>=2.1.8",
     "uvicorn>=0.54.0",
 ]
