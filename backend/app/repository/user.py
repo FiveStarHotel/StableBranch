@@ -60,3 +60,14 @@ async def create_user(
     await session.flush()
 
     return user
+
+
+async def update_username(session: AsyncSession, user: User, username: str) -> User:
+    user.username = username
+    await session.flush()
+    return user
+
+
+async def delete_user(session: AsyncSession, user: User) -> None:
+    await session.delete(user)
+    await session.flush()

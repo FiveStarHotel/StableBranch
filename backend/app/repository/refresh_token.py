@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 
-from sqlalchemy import select, update
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.database.models import RefreshToken
@@ -47,5 +47,11 @@ async def revoke_all_user_refresh_tokens(session: AsyncSession, user_id: int) ->
         .values(revoked_at=datetime.now(UTC))
     )
 
+    await session.execute(stmt)
+    await session.flush()
+
+
+async def delete_user_refresh_tokens(session: AsyncSession, user_id: int) -> None:
+    stmt = delete(RefreshToken).where(RefreshToken.user_id == user_id)
     await session.execute(stmt)
     await session.flush()

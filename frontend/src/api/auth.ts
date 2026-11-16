@@ -57,6 +57,14 @@ export function changePassword(old_password: string, new_password: string) {
   return api<void>('/auth/change-password', { json: { old_password, new_password } })
 }
 
+export function updateUsername(username: string) {
+  return api<User>('/users/me', { method: 'PATCH', json: { username } })
+}
+
+export function deleteAccount() {
+  return api<void>('/users/me', { method: 'DELETE' })
+}
+
 export async function confirmRegistration(email: string, code: string) {
   setTokens(await api<Token>('/auth/register/confirm', { json: { email, code }, auth: false }))
 }
