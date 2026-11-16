@@ -1,5 +1,5 @@
 import { Button, Stack, Text } from '@mantine/core'
-import { SignOut } from '@phosphor-icons/react'
+import { SignOut, UserCircle } from '@phosphor-icons/react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router'
 
@@ -24,6 +24,15 @@ export function ProjectsPage() {
     <AuthLayout title={user?.username ?? ''} subtitle={user?.email}>
       <Text>Меню проектов появится здесь позже</Text>
       <Stack gap="xs">
+        <Button
+          variant="default"
+          size="lg"
+          fullWidth
+          leftSection={<UserCircle size={18} />}
+          onClick={() => navigate('/profile')}
+        >
+          Профиль
+        </Button>
         <Button
           variant="default"
           size="lg"
